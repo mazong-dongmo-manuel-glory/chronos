@@ -186,28 +186,18 @@ class Crawler:
     
 cr = Crawler()
 sites_science_actualite = [
-    "https://www.futura-sciences.com",
-    "https://www.sciencesetavenir.fr",
-    "https://www.lemonde.fr/sciences/",
-    "https://www.larecherche.fr",
-    "https://www.pourlascience.fr",
-    "https://www.science-et-vie.com",
-    "https://www.cnrs.fr",
-    "https://www.inserm.fr",
-    "https://www.cea.fr",
-    "https://www.techno-science.net",
-    "https://www.scienceinfo.fr",
-    "https://www.sciencepresse.qc.ca",
-    "https://www.sciences-faits-histoires.com",
-    "https://www.afis.org",
-    "https://www.universcience.fr",
-    "https://www.espace-sciences.org",
-    "https://www.palais-decouverte.fr",
-    "https://www.cite-sciences.fr",
-    "https://www.cap-sciences.net",
-    "https://www.lacitedes-sciences.fr"
+    "https://www.jewanda-magazine.com/",
+    "http://www.afriquefemme.com/",
+    "https://www.lapresse.ca/blogues/richard-hetu/",
+    "http://www.toukimontreal.com/",
+    "https://www.lacuisinedebernard.com/",
+    "https://www.lefashionpost.com/",
+    "https://voyagesetvagabondages.com/",
+    "https://www.leblogauto.com/",
+    "https://www.jeanmarcmorandini.com/",
+    "https://leblogdesarahb.com/"
 ]
 Data.QUEUE += sites_science_actualite
 Crawler.handleQueue()
 
-cr.crawl("https://www.jeuneafrique.com/")
+cr.crawl("https://wikileaks.org/")
