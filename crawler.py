@@ -12,8 +12,8 @@ class Data:
     QUEUE = []
     LOCK = threading.Lock()
     IN_PROCESS = dict()
-    QUEUE_SIZE = 1000
-    QUEUE_SIZE_INTER = 10
+    QUEUE_SIZE = 2000
+    QUEUE_SIZE_INTER = 500
     NUMBER_OF_THREAD = 0
 class Crawler:
 
@@ -74,7 +74,7 @@ class Crawler:
             url = self.getToQueue()
             if "google" in url:
                 continue
-            if not self.getInProcess(url) and Data.NUMBER_OF_THREAD < 1000:
+            if not self.getInProcess(url) and Data.NUMBER_OF_THREAD < 10000:
                 self.addInProcess(url)
                 cr = Crawler()
                 th = threading.Thread(target=cr.crawl,args=(url,))
@@ -92,7 +92,7 @@ class Crawler:
                 continue
             self.addToQueue(page["links"])
             if Page.insert(page["url"],page["content"],page["links"]):
-                print(url)
+                print(f"{Data.NUMBER_OF_THREAD} {url}")
                 pass
             self.removeInProcess(url)
         self.removeInProcess(url)
@@ -115,7 +115,7 @@ class Crawler:
                     
                 if len(Data.QUEUE) < Data.QUEUE_SIZE:
                     cls.insertUrlInQueue()
-                time.sleep(3)
+                time.sleep(2)
                 
         threading.Thread(target=handle).start()
     @classmethod
@@ -210,4 +210,4 @@ sites_science_actualite = [
 Data.QUEUE += sites_science_actualite
 Crawler.handleQueue()
 
-cr.crawl("https://salvatore.com/fr/")
+cr.crawl("https://www.jeuneafrique.com/")
