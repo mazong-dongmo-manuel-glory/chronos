@@ -1,6 +1,17 @@
-from mongoengine.fields import URLField,StringField,ListField,DateField
+from mongoengine.fields import URLField,StringField,ListField,DateField,ObjectIdField,DictField
 from mongoengine.document import Document
 from datetime import datetime
+
+
+class TfidfScore(Document):
+    page_id = ObjectIdField(required=True, unique=True)
+    scores = DictField(required=True)
+
+class Indexation(Document):
+    page_id = ObjectIdField(required=True, unique=True)
+    tfidf_scores = DictField(required=True)
+    
+    
 class UrlFile(Document):
     url = URLField(unique=True)
     timestamp = DateField(default=datetime.now())

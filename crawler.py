@@ -72,8 +72,6 @@ class Crawler:
         self.addToQueue(root_url)
         while len(Data.QUEUE)>0:
             url = self.getToQueue()
-            if "google" in url:
-                continue
             if not self.getInProcess(url) and Data.NUMBER_OF_THREAD < 10000:
                 self.addInProcess(url)
                 cr = Crawler()
@@ -185,19 +183,7 @@ class Crawler:
         return {"url":url,"links":list(links),"content":content}
     
 cr = Crawler()
-sites_science_actualite = [
-    "https://www.jewanda-magazine.com/",
-    "http://www.afriquefemme.com/",
-    "https://www.lapresse.ca/blogues/richard-hetu/",
-    "http://www.toukimontreal.com/",
-    "https://www.lacuisinedebernard.com/",
-    "https://www.lefashionpost.com/",
-    "https://voyagesetvagabondages.com/",
-    "https://www.leblogauto.com/",
-    "https://www.jeanmarcmorandini.com/",
-    "https://leblogdesarahb.com/"
-]
-Data.QUEUE += sites_science_actualite
+
 Crawler.handleQueue()
 
-cr.crawl("https://wikileaks.org/")
+cr.crawl("https://www.lindaikejisblog.com/")
