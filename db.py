@@ -75,18 +75,19 @@ class Page(Document):
         except:
             return False
 
+
 class Score(Document):
-    url = URLField(unique=True)
-    tfidf_scores = DictField()
+    word = StringField(unique=True)
+    urls = ListField(URLField())
 
     @classmethod
-    def insert_or_update(cls, url, tfidf_scores):
+    def insert_or_update(cls, word, urls):
         try:
-            score = cls.objects.get(url=url)
-            score.tfidf_scores.update(tfidf_scores)
+            score = cls.objects.get(word=word)
+            score.urls.extend(urls)
             score.save()
         except cls.DoesNotExist:
-            score = Score(url=url, tfidf_scores=tfidf_scores)
+            score = Score(word=word, urls=urls)
             score.save()
 
     @classmethod
@@ -103,10 +104,8 @@ class Score(Document):
         for word, page_freq in word_freq_per_page.items():
             idf[word] = log(total_pages / len(page_freq))
 
-        tfidf_per_page = defaultdict(dict)
         for word, page_freq in word_freq_per_page.items():
+            tfidf_scores = {}
             for page, freq in page_freq.items():
-                tfidf_per_page[page][word] = freq * idf[word]
-
-        for page_url, tfidf_scores in tfidf_per_page.items():
-            Score.insert_or_update(page_url, tfidf_scores)
+                tfidf_scores[page] = freq * idf[word]
+            Score.insert_or_update(word, list(tfidf_scores.keys()))
