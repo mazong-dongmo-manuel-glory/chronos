@@ -186,4 +186,4 @@ cr = Crawler()
 
 Crawler.handleQueue()
 
-cr.crawl("https://www.lindaikejisblog.com/")
+cr.crawl("https://prc.cm/fr/")

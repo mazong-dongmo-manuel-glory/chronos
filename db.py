@@ -2,7 +2,8 @@ from mongoengine.fields import URLField,StringField,ListField,DateField,ObjectId
 from mongoengine.document import Document
 from datetime import datetime
 
-
+from collections import defaultdict
+from math import log
 class TfidfScore(Document):
     page_id = ObjectIdField(required=True, unique=True)
     scores = DictField(required=True)
@@ -73,5 +74,39 @@ class Page(Document):
             return False
         except:
             return False
-            
-            
+
+class Score(Document):
+    url = URLField(unique=True)
+    tfidf_scores = DictField()
+
+    @classmethod
+    def insert_or_update(cls, url, tfidf_scores):
+        try:
+            score = cls.objects.get(url=url)
+            score.tfidf_scores.update(tfidf_scores)
+            score.save()
+        except cls.DoesNotExist:
+            score = Score(url=url, tfidf_scores=tfidf_scores)
+            score.save()
+
+    @classmethod
+    def calculate_tfidf(cls):
+        word_freq_per_page = defaultdict(lambda: defaultdict(int))
+        total_pages = Page.objects.count()
+
+        for page in Page.objects:
+            words = page.content.split()
+            for word in set(words):
+                word_freq_per_page[word][page.url] += 1
+
+        idf = {}
+        for word, page_freq in word_freq_per_page.items():
+            idf[word] = log(total_pages / len(page_freq))
+
+        tfidf_per_page = defaultdict(dict)
+        for word, page_freq in word_freq_per_page.items():
+            for page, freq in page_freq.items():
+                tfidf_per_page[page][word] = freq * idf[word]
+
+        for page_url, tfidf_scores in tfidf_per_page.items():
+            Score.insert_or_update(page_url, tfidf_scores)
