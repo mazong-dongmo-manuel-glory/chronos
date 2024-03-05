@@ -12,15 +12,17 @@ class Data:
     QUEUE = []
     LOCK = threading.Lock()
     IN_PROCESS = dict()
-    QUEUE_SIZE = 2000
-    QUEUE_SIZE_INTER = 500
+    QUEUE_SIZE = 1000
+    QUEUE_SIZE_INTER = 100
     NUMBER_OF_THREAD = 0
+    MAX_THREAD = 10
 class Crawler:
 
-    def __init__(self) -> None:
+    def __init__(self,key=0) -> None:
         Data.LOCK.acquire()
         Data.NUMBER_OF_THREAD += 1 
         Data.LOCK.release()
+        self.key = key
         pass
     
     def addToQueue(self,url):
@@ -72,14 +74,13 @@ class Crawler:
         self.addToQueue(root_url)
         while len(Data.QUEUE)>0:
             url = self.getToQueue()
-            if not self.getInProcess(url) and Data.NUMBER_OF_THREAD < 10000:
+            if not self.getInProcess(url) and Data.NUMBER_OF_THREAD < Data.MAX_THREAD:
                 self.addInProcess(url)
-                cr = Crawler()
+                cr = Crawler(key=Data.NUMBER_OF_THREAD)
                 th = threading.Thread(target=cr.crawl,args=(url,))
                 th.start()
                 self.addNumberOfThread()
                 continue
-
             #on verifie si la page existe deja
             if Page.get(url):
                 self.removeInProcess(url)
@@ -90,8 +91,7 @@ class Crawler:
                 continue
             self.addToQueue(page["links"])
             if Page.insert(page["url"],page["content"],page["links"]):
-                print(f"{Data.NUMBER_OF_THREAD} {url}")
-                pass
+                print(f"{self.key} {url}")
             self.removeInProcess(url)
         self.removeInProcess(url)
         self.minusNumberOfThread()
@@ -100,6 +100,8 @@ class Crawler:
             
     @classmethod
     def handleQueue(cls):
+        Data.QUEUE_SIZE = int(Data.QUEUE_SIZE / Data.MAX_THREAD)
+        Data.QUEUE_SIZE_INTER = int(Data.QUEUE_SIZE/Data.MAX_THREAD)
         def handle():
             while True:
                 if len(Data.QUEUE) > Data.QUEUE_SIZE:
@@ -111,15 +113,15 @@ class Crawler:
                     for link in to_save:
                         UrlFile.insert(link)
                     
-                if len(Data.QUEUE) < Data.QUEUE_SIZE:
+                if len(Data.QUEUE) < Data.QUEUE_SIZE/Data.MAX_THREAD:
                     cls.insertUrlInQueue()
-                time.sleep(2)
+              
                 
         threading.Thread(target=handle).start()
     @classmethod
     def insertUrlInQueue(cls):
             Data.LOCK.acquire()
-            Data.QUEUE += UrlFile.get(Data.QUEUE_SIZE)
+            Data.QUEUE += UrlFile.get(Data.QUEUE_SIZE*Data.MAX_THREAD)
             Data.LOCK.release()
         
         
@@ -186,4 +188,4 @@ cr = Crawler()
 
 Crawler.handleQueue()
 
-cr.crawl("https://www.lindaikejisblog.com/")
+cr.crawl("https://fr.wikipedia.com")
