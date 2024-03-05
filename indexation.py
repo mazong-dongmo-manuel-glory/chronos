@@ -1,7 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from mongoengine import connect
 from db import Page, Indexation
-from scipy.sparse import csr_matrix
+
 import numpy as np
 import time
 
@@ -14,7 +14,7 @@ vectorizer = TfidfVectorizer(use_idf=True, norm=None)
 # Function to save TF-IDF scores to the Indexation collection
 def save_tfidf_scores(page, score):
     score_dict = {word: tfidf_score for word, tfidf_score in zip(vectorizer.get_feature_names_out(), score)}
-    Indexation(page_id=page.id, tfidf_scores=score_dict).save()
+    Indexation(page_id=page.id, tfidf_scores=score_dict).save() 
 
 # Number of documents to load at a time
 batch_size = 1  # Process one page at a time
